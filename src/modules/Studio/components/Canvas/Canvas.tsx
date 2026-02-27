@@ -1,57 +1,59 @@
-"use client";
+'use client'
 
-import React from "react";
-import Image from "next/image";
-import { css } from "@styled-system/css";
-import { Box } from "@styled-system/jsx";
-import { useImageOverlayStore } from "@stores/ImageOverlay/ImageOverlay.store";
-import type { ImageOverlayItem } from "@stores/ImageOverlay/ImageOverlay.store";
+import React from 'react'
+import Image from 'next/image'
+import type { ImageOverlayItem } from '@stores/ImageOverlay/ImageOverlay.store'
+import { useImageOverlayStore } from '@stores/ImageOverlay/ImageOverlay.store'
+import { css } from '@styled-system/css'
+import { Box } from '@styled-system/jsx'
 import {
   useCanvasDimensions,
   useDrawing,
   useItemIdSelected,
   useMeme,
   useTextboxes,
-  useTopBlock,
-} from "@viclafouch/meme-studio-utilities/hooks";
-import type { Meme, TextBox } from "@viclafouch/meme-studio-utilities/schemas";
-import Draggable from "../Draggable";
-import ImageOverlayDraggable from "../ImageOverlay";
-import * as Styled from "./Canvas.styles";
+  useTopBlock
+} from '@viclafouch/meme-studio-utilities/hooks'
+import type { Meme, TextBox } from '@viclafouch/meme-studio-utilities/schemas'
+import Draggable from '../Draggable'
+import ImageOverlayDraggable from '../ImageOverlay'
+import * as Styled from './Canvas.styles'
 
 const Canvas = () => {
-  const meme = useMeme() as Meme;
-  const canvasElRef = React.useRef<HTMLCanvasElement>(null!);
-  const { textboxes, updateTextbox } = useTextboxes();
-  const containerRef = React.useRef<HTMLDivElement>(null!);
-  const { canvasDimensions, calculByAspectRatio } = useCanvasDimensions();
-  const topBlock = useTopBlock();
-  const { itemIdSelected, setItemIdSelected } = useItemIdSelected();
+  const meme = useMeme() as Meme
+  const canvasElRef = React.useRef<HTMLCanvasElement>(null!)
+  const { textboxes, updateTextbox } = useTextboxes()
+  const containerRef = React.useRef<HTMLDivElement>(null!)
+  const { canvasDimensions, calculByAspectRatio } = useCanvasDimensions()
+  const topBlock = useTopBlock()
+  const { itemIdSelected, setItemIdSelected } = useItemIdSelected()
 
-  const overlayItems = useImageOverlayStore((s) => s.items);
-  const overlaySelectedId = useImageOverlayStore((s) => s.selectedId);
-  const updateOverlayItem = useImageOverlayStore((s) => s.updateItem);
-  const removeOverlayItem = useImageOverlayStore((s) => s.removeItem);
-  const setOverlaySelectedId = useImageOverlayStore((s) => s.setSelectedId);
+  const overlayItems = useImageOverlayStore((store) => store.items)
+  const overlaySelectedId = useImageOverlayStore((store) => store.selectedId)
+  const updateOverlayItem = useImageOverlayStore((store) => store.updateItem)
+  const removeOverlayItem = useImageOverlayStore((store) => store.removeItem)
+  const setOverlaySelectedId = useImageOverlayStore(
+    (store) => store.setSelectedId
+  )
 
   useDrawing({
     canvasElRef,
-    containerRef,
-  });
+    containerRef
+  })
 
   const onDraggableClick = React.useCallback(
     (item: TextBox) => {
-      setItemIdSelected(item.id, true);
-      setOverlaySelectedId(null);
+      setItemIdSelected(item.id, true)
+      setOverlaySelectedId(null)
     },
-    [setItemIdSelected, setOverlaySelectedId],
-  );
+    [setItemIdSelected, setOverlaySelectedId]
+  )
 
   const handleCanvasClick = React.useCallback(() => {
-    setOverlaySelectedId(null);
-  }, [setOverlaySelectedId]);
+    setOverlaySelectedId(null)
+  }, [setOverlaySelectedId])
 
-  const topBlockHeight = calculByAspectRatio(topBlock.baseHeight);
+  const topBlockHeight = calculByAspectRatio(topBlock.baseHeight)
 
   return (
     <Styled.Wrapper ref={containerRef}>
@@ -81,14 +83,14 @@ const Canvas = () => {
           alt={meme.name}
           className={css({
             zIndex: -1,
-            objectFit: "cover",
-            position: "absolute",
+            objectFit: 'cover',
+            position: 'absolute',
             left: 0,
-            right: 0,
+            right: 0
           })}
           style={{
             top: topBlock.isVisible ? topBlockHeight : 0,
-            height: "auto",
+            height: 'auto'
           }}
           width={canvasDimensions.width}
           height={canvasDimensions.height}
@@ -105,7 +107,7 @@ const Canvas = () => {
                   onClick={onDraggableClick}
                   isSelected={itemIdSelected === textbox.id}
                 />
-              );
+              )
             })
           : null}
         {canvasDimensions.height
@@ -118,24 +120,24 @@ const Canvas = () => {
                   canvasWidth={canvasDimensions.width}
                   isSelected={overlaySelectedId === overlayItem.id}
                   onSelect={(id) => {
-                    setOverlaySelectedId(id);
-                    setItemIdSelected("", false);
+                    setOverlaySelectedId(id)
+                    setItemIdSelected('', false)
                   }}
                   onUpdate={updateOverlayItem}
                   onDelete={removeOverlayItem}
                 />
-              );
+              )
             })
           : null}
         <canvas
-          className={css({ position: "relative", zIndex: "-1" })}
+          className={css({ position: 'relative', zIndex: '-1' })}
           ref={canvasElRef}
           width={canvasDimensions.width}
           height={canvasDimensions.height}
         />
       </Box>
     </Styled.Wrapper>
-  );
-};
+  )
+}
 
-export default Canvas;
+export default Canvas

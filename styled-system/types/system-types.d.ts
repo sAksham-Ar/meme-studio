@@ -1,14 +1,16 @@
 /* eslint-disable */
-import type {  ConditionalValue, Nested  } from './conditions';
-import type {  AtRule, PropertiesFallback  } from './csstype';
-import type {  SystemProperties, CssVarProperties  } from './style-props';
+import type { ConditionalValue, Nested } from './conditions'
+import type { AtRule, PropertiesFallback } from './csstype'
+import type { SystemProperties, CssVarProperties } from './style-props'
 
 type String = string & {}
 type Number = number & {}
 
 export type Pretty<T> = { [K in keyof T]: T[K] } & {}
 
-export type DistributiveOmit<T, K extends keyof any> = T extends unknown ? Omit<T, K> : never
+export type DistributiveOmit<T, K extends keyof any> = T extends unknown
+  ? Omit<T, K>
+  : never
 
 export type DistributiveUnion<T, U> = {
   [K in keyof T]: K extends keyof U ? U[K] | T[K] : T[K]
@@ -24,7 +26,9 @@ export type Assign<T, U> = {
 
 export type CssProperty = keyof PropertiesFallback
 
-export interface CssProperties extends PropertiesFallback<String | Number>, CssVarProperties {}
+export interface CssProperties
+  extends PropertiesFallback<String | Number>,
+    CssVarProperties {}
 
 export interface CssKeyframes {
   [name: string]: {
@@ -46,7 +50,10 @@ interface GenericProperties {
 
 export type NestedCssProperties = Nested<CssProperties>
 
-export type SystemStyleObject = Omit<Nested<SystemProperties & CssVarProperties>, 'base'>
+export type SystemStyleObject = Omit<
+  Nested<SystemProperties & CssVarProperties>,
+  'base'
+>
 
 export interface GlobalStyleObject {
   [selector: string]: SystemStyleObject
@@ -64,13 +71,16 @@ type FilterStyleObject<P extends string> = {
   [K in P]?: K extends keyof SystemStyleObject ? SystemStyleObject[K] : unknown
 }
 
-export type CompositionStyleObject<Property extends string> = Nested<FilterStyleObject<Property> & CssVarProperties>
+export type CompositionStyleObject<Property extends string> = Nested<
+  FilterStyleObject<Property> & CssVarProperties
+>
 
 /* -----------------------------------------------------------------------------
  * Font face
  * -----------------------------------------------------------------------------*/
 
-export type GlobalFontfaceRule = Omit<AtRule.FontFaceFallback, 'src'> & Required<Pick<AtRule.FontFaceFallback, 'src'>>
+export type GlobalFontfaceRule = Omit<AtRule.FontFaceFallback, 'src'> &
+  Required<Pick<AtRule.FontFaceFallback, 'src'>>
 
 export type FontfaceRule = Omit<GlobalFontfaceRule, 'fontFamily'>
 
@@ -99,11 +109,17 @@ export interface PatchedHTMLProps {
   htmlContent?: string
 }
 
-export type OmittedHTMLProps = 'color' | 'translate' | 'transition' | 'width' | 'height' | 'content'
+export type OmittedHTMLProps =
+  | 'color'
+  | 'translate'
+  | 'transition'
+  | 'width'
+  | 'height'
+  | 'content'
 
 type WithHTMLProps<T> = DistributiveOmit<T, OmittedHTMLProps> & PatchedHTMLProps
 
-export type JsxHTMLProps<T extends Record<string, any>, P extends Record<string, any> = {}> = Assign<
-  WithHTMLProps<T>,
-  P
->
+export type JsxHTMLProps<
+  T extends Record<string, any>,
+  P extends Record<string, any> = {}
+> = Assign<WithHTMLProps<T>, P>

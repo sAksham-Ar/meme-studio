@@ -1,1 +1,3 @@
-export { default } from "./ImageOverlay";
+import ImageOverlayDraggable from './ImageOverlay'
+
+export default ImageOverlayDraggable

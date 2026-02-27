@@ -1,8 +1,8 @@
-import React from "react";
-import { Skeleton, styled, VStack } from "@styled-system/jsx";
-import { skeleton } from "@styled-system/patterns";
+import React from 'react'
+import { Skeleton, styled, VStack } from '@styled-system/jsx'
+import { skeleton } from '@styled-system/patterns'
 
-const skeletons = [1, 2, 3, 4, 5] as const;
+const skeletons = [1, 2, 3, 4, 5] as const
 
 const GallerySuspend = () => {
   return (
@@ -10,9 +10,9 @@ const GallerySuspend = () => {
       <styled.div w="full" p="2" flexShrink={0}>
         <Skeleton
           className={skeleton({
-            w: "full",
-            h: "38px",
-            borderRadius: "md",
+            w: 'full',
+            h: '38px',
+            borderRadius: 'md'
           })}
         />
       </styled.div>
@@ -23,20 +23,20 @@ const GallerySuspend = () => {
               <li key={skeletonId}>
                 <Skeleton
                   className={skeleton({
-                    w: "full",
-                    h: "200px",
-                    borderWidth: "2px",
-                    borderStyle: "solid",
-                    borderColor: "gray.600",
+                    w: 'full',
+                    h: '200px',
+                    borderWidth: '2px',
+                    borderStyle: 'solid',
+                    borderColor: 'gray.600'
                   })}
                 />
               </li>
-            );
+            )
           })}
         </styled.ul>
       </styled.div>
     </VStack>
-  );
-};
+  )
+}
 
-export default GallerySuspend;
+export default GallerySuspend

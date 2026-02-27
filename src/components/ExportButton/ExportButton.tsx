@@ -1,89 +1,88 @@
-"use client";
+'use client'
 
-import React from "react";
-import { useTranslations } from "next-intl";
-import Button from "@components/Button";
-import { useNotifications } from "@shared/hooks/useNotifications";
-import { useShowModal } from "@stores/Modal/Modal.provider";
-import { useImageOverlayStore } from "@stores/ImageOverlay/ImageOverlay.store";
-import { compositeImageOverlays } from "@shared/utils/compositeImageOverlays";
-import { faArrowCircleDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useMutation } from "@tanstack/react-query";
-import { exportCanvasBlob } from "@viclafouch/meme-studio-utilities/helpers";
+import React from 'react'
+import { useTranslations } from 'next-intl'
+import Button from '@components/Button'
+import { useNotifications } from '@shared/hooks/useNotifications'
+import { compositeImageOverlays } from '@shared/utils/compositeImageOverlays'
+import { useImageOverlayStore } from '@stores/ImageOverlay/ImageOverlay.store'
+import { useShowModal } from '@stores/Modal/Modal.provider'
+import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useMutation } from '@tanstack/react-query'
+import { exportCanvasBlob } from '@viclafouch/meme-studio-utilities/helpers'
 import {
   useCanvasDimensions,
   useMeme,
   useRatiotedTextboxes,
-  useTopBlock,
-} from "@viclafouch/meme-studio-utilities/hooks";
-import type { Meme } from "@viclafouch/meme-studio-utilities/schemas";
+  useTopBlock
+} from '@viclafouch/meme-studio-utilities/hooks'
+import type { Meme } from '@viclafouch/meme-studio-utilities/schemas'
 
 const ExportButton = () => {
-  const meme = useMeme();
-  const t = useTranslations();
-  const showModal = useShowModal();
-  const topBlock = useTopBlock();
-  const { notifyError } = useNotifications();
-  const getScaledTextsByMemeSize = useRatiotedTextboxes();
-  const { canvasDimensions } = useCanvasDimensions();
-  const overlayItems = useImageOverlayStore((s) => s.items);
+  const meme = useMeme()
+  const t = useTranslations()
+  const showModal = useShowModal()
+  const topBlock = useTopBlock()
+  const { notifyError } = useNotifications()
+  const getScaledTextsByMemeSize = useRatiotedTextboxes()
+  const { canvasDimensions } = useCanvasDimensions()
+  const overlayItems = useImageOverlayStore((store) => store.items)
 
   const exportCanvasMutation = useMutation({
     mutationFn: async (body: { meme: Meme }) => {
       await new Promise((resolve) => {
-        setTimeout(resolve, 300);
-      });
+        setTimeout(resolve, 300)
+      })
 
       const baseBlob = await exportCanvasBlob({
         meme: body.meme,
         topBlock,
-        texts: getScaledTextsByMemeSize(),
-      });
+        texts: getScaledTextsByMemeSize()
+      })
 
       const totalHeight =
-        body.meme.height + (topBlock.isVisible ? topBlock.baseHeight : 0);
+        body.meme.height + (topBlock.isVisible ? topBlock.baseHeight : 0)
 
-      // Composite image overlays on top of the exported meme
       const finalBlob = await compositeImageOverlays({
         baseBlob,
         overlayItems,
         canvasDisplayWidth: canvasDimensions.width,
         canvasDisplayHeight: canvasDimensions.height,
         targetWidth: body.meme.width,
-        targetHeight: totalHeight,
-      });
+        targetHeight: totalHeight
+      })
 
-      return finalBlob;
+      return finalBlob
     },
     onError: () => {
-      notifyError();
+      notifyError()
     },
     onSuccess: (blob: Blob, variables) => {
       const totalHeight =
-        variables.meme.height + (topBlock.isVisible ? topBlock.baseHeight : 0);
+        variables.meme.height + (topBlock.isVisible ? topBlock.baseHeight : 0)
 
-      showModal("export", {
+      showModal('export', {
         canvasBlob: blob,
         width: variables.meme.width,
-        height: totalHeight,
-      });
-    },
-  });
+        height: totalHeight
+      })
+    }
+  })
 
   const handleOpenExportModal = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (!meme) {
-      return;
+      return
     }
 
     exportCanvasMutation.mutate({
-      meme,
-    });
-  };
+      meme
+    })
+  }
 
   return (
     <Button
@@ -93,9 +92,9 @@ const ExportButton = () => {
       onClick={handleOpenExportModal}
       startAdornment={<FontAwesomeIcon icon={faArrowCircleDown} />}
     >
-      {t("tools.exportMeme").toUpperCase()}
+      {t('tools.exportMeme').toUpperCase()}
     </Button>
-  );
-};
+  )
+}
 
-export default ExportButton;
+export default ExportButton

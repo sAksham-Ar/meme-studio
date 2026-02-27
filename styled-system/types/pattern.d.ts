@@ -1,9 +1,11 @@
 /* eslint-disable */
-import type {  CssProperty, SystemStyleObject  } from './system-types';
-import type {  TokenCategory  } from '../tokens/index';
+import type { CssProperty, SystemStyleObject } from './system-types'
+import type { TokenCategory } from '../tokens/index'
 
 type Primitive = string | number | boolean | null | undefined
-type LiteralUnion<T, K extends Primitive = string> = T | (K & Record<never, never>)
+type LiteralUnion<T, K extends Primitive = string> =
+  | T
+  | (K & Record<never, never>)
 
 export type PatternProperty =
   | { type: 'property'; value: CssProperty }
@@ -26,9 +28,13 @@ type InferProps<T> = Record<LiteralUnion<keyof T>, any>
 
 export type PatternDefaultValue<T> = Partial<InferProps<T>>
 
-export type PatternDefaultValueFn<T> = (props: InferProps<T>) => PatternDefaultValue<T>
+export type PatternDefaultValueFn<T> = (
+  props: InferProps<T>
+) => PatternDefaultValue<T>
 
-export interface PatternConfig<T extends PatternProperties = PatternProperties> {
+export interface PatternConfig<
+  T extends PatternProperties = PatternProperties
+> {
   /**
    * The description of the pattern. This will be used in the JSDoc comment.
    */
@@ -49,7 +55,10 @@ export interface PatternConfig<T extends PatternProperties = PatternProperties> 
   /**
    * The css object this pattern will generate.
    */
-  transform?: (props: InferProps<T>, helpers: PatternHelpers) => SystemStyleObject
+  transform?: (
+    props: InferProps<T>,
+    helpers: PatternHelpers
+  ) => SystemStyleObject
   /**
    * Whether the pattern is deprecated.
    */

@@ -1,1 +1,3 @@
-export { default } from "./ImageOverlaysPanel";
+import ImageOverlaysPanel from './ImageOverlaysPanel'
+
+export default ImageOverlaysPanel

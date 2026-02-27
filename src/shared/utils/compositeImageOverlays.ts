@@ -1,4 +1,15 @@
-import type { ImageOverlayItem } from "@stores/ImageOverlay/ImageOverlay.store";
+import type { ImageOverlayItem } from '@stores/ImageOverlay/ImageOverlay.store'
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
 
 /**
  * Draws image overlays onto an existing canvas Blob.
@@ -11,75 +22,70 @@ export async function compositeImageOverlays({
   canvasDisplayWidth,
   canvasDisplayHeight,
   targetWidth,
-  targetHeight,
+  targetHeight
 }: {
-  baseBlob: Blob;
-  overlayItems: ImageOverlayItem[];
-  canvasDisplayWidth: number;
-  canvasDisplayHeight: number;
-  targetWidth: number;
-  targetHeight: number;
+  baseBlob: Blob
+  overlayItems: ImageOverlayItem[]
+  canvasDisplayWidth: number
+  canvasDisplayHeight: number
+  targetWidth: number
+  targetHeight: number
 }): Promise<Blob> {
   if (overlayItems.length === 0) {
-    return baseBlob;
+    return baseBlob
   }
 
-  // Create an offscreen canvas at full resolution
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas')
 
-  if (!ctx) {
-    return baseBlob;
+  canvas.width = targetWidth
+  canvas.height = targetHeight
+
+  const canvasCtx = canvas.getContext('2d')
+
+  if (!canvasCtx) {
+    return baseBlob
   }
 
-  // Draw the base meme (already has text baked in)
-  const baseUrl = URL.createObjectURL(baseBlob);
-  const baseImg = await loadImage(baseUrl);
+  const baseUrl = URL.createObjectURL(baseBlob)
+  const baseImg = await loadImage(baseUrl)
 
-  ctx.drawImage(baseImg, 0, 0, targetWidth, targetHeight);
-  URL.revokeObjectURL(baseUrl);
+  canvasCtx.drawImage(baseImg, 0, 0, targetWidth, targetHeight)
+  URL.revokeObjectURL(baseUrl)
 
-  // Scale factor from display to original
-  const scaleX = targetWidth / canvasDisplayWidth;
-  const scaleY = targetHeight / canvasDisplayHeight;
+  const scaleX = targetWidth / canvasDisplayWidth
+  const scaleY = targetHeight / canvasDisplayHeight
 
-  // Draw each image overlay
-  for (const item of overlayItems) {
-    const img = await loadImage(item.src);
+  const overlayImages = await Promise.all(
+    overlayItems.map((item) => loadImage(item.src))
+  )
 
-    const scaledW = item.width * scaleX;
-    const scaledH = item.height * scaleY;
-    const scaledCx = item.centerX * scaleX;
-    const scaledCy = item.centerY * scaleY;
+  overlayImages.forEach((img, index) => {
+    const item = overlayItems[index]
 
-    ctx.save();
-    ctx.globalAlpha = item.opacity;
-    ctx.translate(scaledCx, scaledCy);
-    ctx.rotate((item.rotate * Math.PI) / 180);
-    ctx.drawImage(img, -scaledW / 2, -scaledH / 2, scaledW, scaledH);
-    ctx.restore();
-  }
+    if (!item) {
+      return
+    }
+
+    const scaledW = item.width * scaleX
+    const scaledH = item.height * scaleY
+    const scaledCx = item.centerX * scaleX
+    const scaledCy = item.centerY * scaleY
+
+    canvasCtx.save()
+    canvasCtx.globalAlpha = item.opacity
+    canvasCtx.translate(scaledCx, scaledCy)
+    canvasCtx.rotate((item.rotate * Math.PI) / 180)
+    canvasCtx.drawImage(img, -scaledW / 2, -scaledH / 2, scaledW, scaledH)
+    canvasCtx.restore()
+  })
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (blob) {
-        resolve(blob);
+        resolve(blob)
       } else {
-        reject(new Error("Failed to generate canvas blob"));
+        reject(new Error('Failed to generate canvas blob'))
       }
-    }, "image/png");
-  });
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
+    }, 'image/png')
+  })
 }
